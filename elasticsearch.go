@@ -9,9 +9,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic/go-elasticsearch/v7/esapi"
-	"github.com/elastic/go-elasticsearch/v7/estransport"
-	"github.com/elastic/go-elasticsearch/v7/internal/version"
+	"github.com/Velocidex/go-elasticsearch/v7/esapi"
+	"github.com/Velocidex/go-elasticsearch/v7/estransport"
+	"github.com/Velocidex/go-elasticsearch/v7/internal/version"
 )
 
 const (
