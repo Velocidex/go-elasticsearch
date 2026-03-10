@@ -1,0 +1,43 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+// Code generated from the elasticsearch-specification DO NOT EDIT.
+// https://github.com/elastic/elasticsearch-specification/tree/b1811e10a0722431d79d1c234dd412ff47d8656f
+
+package enrollkibana
+
+import (
+	"github.com/Velocidex/go-elasticsearch/v9/typedapi/types"
+)
+
+// Response holds the response body struct for the package enrollkibana
+//
+// https://github.com/elastic/elasticsearch-specification/blob/b1811e10a0722431d79d1c234dd412ff47d8656f/specification/security/enroll_kibana/Response.ts#L20-L29
+type Response struct {
+	// HttpCa The CA certificate used to sign the node certificates that Elasticsearch uses
+	// for TLS on the HTTP layer.
+	// The certificate is returned as a Base64 encoded string of the ASN.1 DER
+	// encoding of the certificate.
+	HttpCa string            `json:"http_ca"`
+	Token  types.KibanaToken `json:"token"`
+}
+
+// NewResponse returns a Response
+func NewResponse() *Response {
+	r := &Response{}
+	return r
+}

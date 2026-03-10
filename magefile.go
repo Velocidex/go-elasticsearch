@@ -20,10 +20,16 @@ type mutation struct {
 	// Copy files
 	From, To string
 
+	// Copy directory recursively
+	FromDir string
+
 	// Go Replace by regex
 	Match, Replace, Glob string
 
 	DeleteGlob string
+
+	// Recursively remove Dir
+	DeleteDir string
 }
 
 type DependencyGithub struct {
@@ -33,12 +39,23 @@ type DependencyGithub struct {
 
 var (
 	deps = []DependencyGithub{
-		{Repo: "https://github.com/elastic/go-elasticsearch",
+		{Repo: "https://github.com/Velocidex/go-elasticsearch",
 			Branch: "9.3"},
 	}
 
 	// Transform the codebase so it can build
-	mutations = []mutation{}
+	mutations = []mutation{
+		{DeleteDir: "../esapi"},
+		{DeleteDir: "../internal"},
+		{DeleteDir: "../typedapi"},
+		{FromDir: "go-elasticsearch/esapi", To: "../esapi"},
+		{FromDir: "go-elasticsearch/internal", To: "../internal"},
+		{FromDir: "go-elasticsearch/typedapi", To: "../typedapi"},
+		{Glob: "../**/*.go", Match: "github.com/Velocidex/go-elasticsearch",
+			Replace: "github.com/Velocidex/go-elasticsearch"},
+		{From: "../patches/elasticsearch.go", To: "../elasticsearch.go"},
+		{From: "../patches/api._.go", To: "../esapi/api._.go"},
+	}
 )
 
 func replace_string_in_file(filename string, old string, new string) error {
@@ -91,6 +108,17 @@ func Build() error {
 	}
 
 	for _, m := range mutations {
+		if m.FromDir != "" {
+			fmt.Printf("Copying Recursive %v to %v\n", m.FromDir, m.To)
+			fsys := os.DirFS(m.FromDir)
+			os.MkdirAll(m.To, 0755)
+			err := os.CopyFS(m.To, fsys)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
 		if m.From != "" {
 			fmt.Printf("Copying %v to %v\n", m.From, m.To)
 			basedir := filepath.Dir(m.To)
@@ -100,6 +128,13 @@ func Build() error {
 			if err != nil {
 				return err
 			}
+			continue
+		}
+
+		if m.DeleteDir != "" {
+			fmt.Printf("Removing Directory %v\n", m.DeleteDir)
+			os.RemoveAll(m.DeleteDir)
+			continue
 		}
 
 		if m.DeleteGlob != "" {
@@ -121,6 +156,8 @@ func Build() error {
 		}
 
 		if m.Glob != "" {
+			fmt.Printf("Replacing %v with %v in %v\n", m.Match, m.Replace, m.Glob)
+
 			basepath, pattern := doublestar.SplitPattern(m.Glob)
 			fsys := os.DirFS(basepath)
 			matches, err := doublestar.Glob(fsys, pattern)
@@ -130,7 +167,6 @@ func Build() error {
 
 			for _, match := range matches {
 				filename := filepath.Join(basepath, match)
-				fmt.Printf("Replacing %v in %v\n", m.Match, filename)
 				err = replace_string_in_file(filename, m.Match, m.Replace)
 				if err != nil {
 					return err

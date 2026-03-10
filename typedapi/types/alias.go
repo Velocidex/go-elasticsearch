@@ -1,0 +1,167 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+// Code generated from the elasticsearch-specification DO NOT EDIT.
+// https://github.com/elastic/elasticsearch-specification/tree/b1811e10a0722431d79d1c234dd412ff47d8656f
+
+package types
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
+// Alias type.
+//
+// https://github.com/elastic/elasticsearch-specification/blob/b1811e10a0722431d79d1c234dd412ff47d8656f/specification/indices/_types/Alias.ts#L23-L53
+type Alias struct {
+	// Filter Query used to limit documents the alias can access.
+	Filter *Query `json:"filter,omitempty"`
+	// IndexRouting Value used to route indexing operations to a specific shard.
+	// If specified, this overwrites the `routing` value for indexing operations.
+	IndexRouting []string `json:"index_routing,omitempty"`
+	// IsHidden If `true`, the alias is hidden.
+	// All indices for the alias must have the same `is_hidden` value.
+	IsHidden *bool `json:"is_hidden,omitempty"`
+	// IsWriteIndex If `true`, the index is the write index for the alias.
+	IsWriteIndex *bool `json:"is_write_index,omitempty"`
+	// Routing Value used to route indexing and search operations to a specific shard.
+	Routing []string `json:"routing,omitempty"`
+	// SearchRouting Value used to route search operations to a specific shard.
+	// If specified, this overwrites the `routing` value for search operations.
+	SearchRouting []string `json:"search_routing,omitempty"`
+}
+
+func (s *Alias) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
+
+		case "index_routing":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "IndexRouting", err)
+				}
+
+				s.IndexRouting = append(s.IndexRouting, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.IndexRouting); err != nil {
+					return fmt.Errorf("%s | %w", "IndexRouting", err)
+				}
+			}
+
+		case "is_hidden":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsHidden", err)
+				}
+				s.IsHidden = &value
+			case bool:
+				s.IsHidden = &v
+			}
+
+		case "is_write_index":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsWriteIndex", err)
+				}
+				s.IsWriteIndex = &value
+			case bool:
+				s.IsWriteIndex = &v
+			}
+
+		case "routing":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Routing", err)
+				}
+
+				s.Routing = append(s.Routing, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Routing); err != nil {
+					return fmt.Errorf("%s | %w", "Routing", err)
+				}
+			}
+
+		case "search_routing":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "SearchRouting", err)
+				}
+
+				s.SearchRouting = append(s.SearchRouting, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.SearchRouting); err != nil {
+					return fmt.Errorf("%s | %w", "SearchRouting", err)
+				}
+			}
+
+		}
+	}
+	return nil
+}
+
+// NewAlias returns a Alias.
+func NewAlias() *Alias {
+	r := &Alias{}
+
+	return r
+}
+
+type AliasVariant interface {
+	AliasCaster() *Alias
+}
+
+func (s *Alias) AliasCaster() *Alias {
+	return s
+}
