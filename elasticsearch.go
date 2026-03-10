@@ -423,7 +423,11 @@ func (c *BaseClient) doProductCheck(f func() error) error {
 
 // genuineCheckHeader validates the presence of the X-Elastic-Product header
 func genuineCheckHeader(header http.Header) error {
+
+	// Velocidex: For our purposes this client library works fine with
+	// both Elastic and OpenSearch. Remove this pointless check.
 	return nil
+
 	if header.Get("X-Elastic-Product") != "Elasticsearch" {
 		return errors.New(unknownProduct)
 	}

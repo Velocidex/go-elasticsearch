@@ -39,7 +39,7 @@ type DependencyGithub struct {
 
 var (
 	deps = []DependencyGithub{
-		{Repo: "https://github.com/Velocidex/go-elasticsearch",
+		{Repo: "https://github.com/elastic/go-elasticsearch",
 			Branch: "9.3"},
 	}
 
@@ -51,7 +51,8 @@ var (
 		{FromDir: "go-elasticsearch/esapi", To: "../esapi"},
 		{FromDir: "go-elasticsearch/internal", To: "../internal"},
 		{FromDir: "go-elasticsearch/typedapi", To: "../typedapi"},
-		{Glob: "../**/*.go", Match: "github.com/Velocidex/go-elasticsearch",
+		{Glob: "../{esapi,internal,typedapi}/**/*.go",
+			Match:   "github.com/elastic/go-elasticsearch",
 			Replace: "github.com/Velocidex/go-elasticsearch"},
 		{From: "../patches/elasticsearch.go", To: "../elasticsearch.go"},
 		{From: "../patches/api._.go", To: "../esapi/api._.go"},
@@ -107,6 +108,19 @@ func Build() error {
 		}
 	}
 
+	return ApplyMutations(mutations)
+}
+
+func Clean() error {
+	return ApplyMutations([]mutation{
+		{DeleteDir: "./build"},
+		{DeleteDir: "./esapi"},
+		{DeleteDir: "./internal"},
+		{DeleteDir: "./typedapi"},
+	})
+}
+
+func ApplyMutations(mutations []mutation) error {
 	for _, m := range mutations {
 		if m.FromDir != "" {
 			fmt.Printf("Copying Recursive %v to %v\n", m.FromDir, m.To)
